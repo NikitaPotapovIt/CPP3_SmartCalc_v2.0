@@ -105,28 +105,28 @@ double SmartCalcModel::calc(std::shared_ptr<Node> end) {
 }
 
 double SmartCalcModel::arithmetic(double a, double b, Type sym) {
-    switch (sym) {
-        case Type::PLUS: return a + b;
-        case Type::MINUS: return a - b;
-        case Type::DIV: return a / b;
-        case Type::MULT: return a * b;
-        case Type::POW: return std::pow(a, b);
-        case Type::MOD: return std::fmod(a, b);
+    switch (static_cast<int>(sym)) {
+        case static_cast<int>(Type::PLUS): return a + b;
+        case static_cast<int>(Type::MINUS): return a - b;
+        case static_cast<int>(Type::DIV): return a / b;
+        case static_cast<int>(Type::MULT): return a * b;
+        case static_cast<int>(Type::POW): return std::pow(a, b);
+        case static_cast<int>(Type::MOD): return std::fmod(a, b);
         default: return 0;
     }
 }
 
 double SmartCalcModel::trigonometry(double a, Type sym) {
-    switch (sym) {
-        case Type::SIN: return std::sin(a);
-        case Type::COS: return std::cos(a);
-        case Type::TAN: return std::tan(a);
-        case Type::ASIN: return std::asin(a);
-        case Type::ACOS: return std::acos(a);
-        case Type::ATAN: return std::atan(a);
-        case Type::SQRT: return std::sqrt(a);
-        case Type::LN: return std::log(a);
-        case Type::LOG: return std::log10(a);
+    switch (static_cast<int>(sym)) {
+        case static_cast<int>(Type::SIN): return std::sin(a);
+        case static_cast<int>(Type::COS): return std::cos(a);
+        case static_cast<int>(Type::TAN): return std::tan(a);
+        case static_cast<int>(Type::ASIN): return std::asin(a);
+        case static_cast<int>(Type::ACOS): return std::acos(a);
+        case static_cast<int>(Type::ATAN): return std::atan(a);
+        case static_cast<int>(Type::SQRT): return std::sqrt(a);
+        case static_cast<int>(Type::LN): return std::log(a);
+        case static_cast<int>(Type::LOG): return std::log10(a);
         default: return 0;
     }
 }

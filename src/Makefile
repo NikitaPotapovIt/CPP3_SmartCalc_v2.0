@@ -1,41 +1,47 @@
-.PHONY: all test clean rebuild dist install uninstall gcov_report open check
+.PHONY: all clean dist test install uninstall rebuild gcov_report open
 
 CC = g++
-CFLAGS = -Wall -Wextra -Werror -std=c++17
-SRC_FILES = smartcalc_model.cpp smartcalc_controller.cpp smartcalc_view.cpp main.cpp
+CFLAGS = -Wall -Wextra -Werror -std=c++17 `pkg-config --cflags --libs Qt5Widgets`
+LDFLAGS = `pkg-config --libs Qt5Core Qt5Gui Qt5Widgets`
+SRC_FILES = smartcalc_model.cpp \
+            smartcalc_controller.cpp \
+            smartcalc_view.cpp \
+            ./calc/credit.cpp \
+            ./calc/deposit.cpp \
+            ./calc/main.cpp \
+            ./calc/mainwindow.cpp
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
-LIB = -lm
+TARGET = smartcalc
 
-all: smartcalc
+all: $(TARGET)
 
-smartcalc: $(OBJ_FILES)
-	$(CC) $(CFLAGS) -o smartcalc $(OBJ_FILES) $(LIB)
+$(TARGET): $(OBJ_FILES)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ_FILES) $(LDFLAGS)
 
-test: smartcalc
-	./smartcalc
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
+
+test: $(TARGET)
+	./$(TARGET)
 
 dist:
-	rm -rf Archive_calc_v1.0/
-	mkdir Archive_calc_v1.0/
-	mkdir Archive_calc_v1.0/src/
-	cp -r ./smartcalc Archive_calc_v1.0/src/
-	tar cvzf Archive_calc_v1.0.tgz Archive_calc_v1.0/
-	rm -rf Archive_calc_v1.0/
+	mkdir -p Archive_calc_v1.0/src
+	cp $(TARGET) Archive_calc_v1.0/src/
+	tar cvzf Archive_calc_v1.0.tgz Archive_calc_v1.0
+	rm -rf Archive_calc_v1.0
 
 install:
-	mkdir build
-	cp smartcalc build/smartcalc
+	mkdir -p build
+	cp $(TARGET) build/
 
 uninstall:
 	rm -rf build
 
-gcov_report: gcov_test.info
-
-gcov_test.info: gcov_test gcov_test.gcda
+gcov_report: $(SRC_FILES)
+	$(CC) $(CFLAGS) --coverage $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
+	./$(TARGET)
 	lcov -t "gcov_test" -o gcov_test.info --no-external -c -d .
-
-gcov_test: $(SRC_FILES)
-	$(CC) $(CFLAGS) -fprofile-arcs -ftest-coverage $(SRC_FILES) -o gcov_test $(LIB)
+	genhtml gcov_test.info -o report
 
 open: gcov_report
 	open report/index.html
@@ -43,9 +49,4 @@ open: gcov_report
 rebuild: clean all
 
 clean:
-	@rm -rf *.o smartcalc
-	@rm -rf Archive_calc_v1.0
-	@rm -rf *.tgz
-	@rm -rf build
-	@rm -rf *.gcno
-	@rm -rf *.gcda
+	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v1.0 build

@@ -49,7 +49,7 @@ background-color: black;</string>
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>560</y>
+      <y>630</y>
       <width>261</width>
       <height>61</height>
      </rect>
@@ -357,9 +357,9 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>480</y>
-      <width>121</width>
-      <height>71</height>
+      <y>560</y>
+      <width>261</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="styleSheet">

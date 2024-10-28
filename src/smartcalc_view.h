@@ -1,21 +1,16 @@
 #ifndef SMARTCALC_VIEW_H_
 #define SMARTCALC_VIEW_H_
 
-#include <iostream>
 #include <string>
 
+// Класс представления для работы с пользовательским интерфейсом
 class SmartCalcView {
 public:
-    void getUserInput(std::string& expression, double& x_value) {
-        std::cout << "Введите математическое выражение: ";
-        std::getline(std::cin, expression);
-        std::cout << "Введите значение переменной x: ";
-        std::cin >> x_value;
-    }
+    // Метод для получения пользовательского ввода
+    void getUserInput(std::string& expression, double& x_value);
 
-    void showResult(double result) {
-        std::cout << "Результат: " << result << std::endl;
-    }
+    // Метод для отображения результата
+    void showResult(double result);
 };
 
 #endif  // SMARTCALC_VIEW_H_

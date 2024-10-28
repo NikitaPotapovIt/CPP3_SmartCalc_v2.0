@@ -6,16 +6,7 @@
 #include <QVector>
 #include <QTimer>
 #include <QtMath>
-//#include <QLineEdit>
 #include "ui_mainwindow.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "../s21_SmartCalc.h"
-#ifdef __cplusplus
-}
-#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

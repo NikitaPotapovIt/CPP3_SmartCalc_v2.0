@@ -1,18 +1,19 @@
 #ifndef SMARTCALC_CONTROLLER_H_
 #define SMARTCALC_CONTROLLER_H_
 
+#include <string>
 #include "smartcalc_model.h"
 
+// Контроллер для управления моделью
 class SmartCalcController {
 public:
-    SmartCalcController(SmartCalcModel* model) : model_(model) {}
+    explicit SmartCalcController(SmartCalcModel* model);
 
-    double calculateExpression(const std::string& expression, double x_value) {
-        return model_->parse(expression, x_value);
-    }
+    // Метод для вычисления выражения
+    double calculateExpression(const std::string& expression, double x_value);
 
 private:
-    SmartCalcModel* model_;
+    SmartCalcModel* model_;  // Указатель на модель
 };
 
 #endif  // SMARTCALC_CONTROLLER_H_

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "credit.h"
 #include "deposit.h"
+#include "../smartcalc_model.h"
 
 double num_first;
 int flag = 0;
@@ -143,7 +144,7 @@ void MainWindow::on_pushButton_equals_clicked() {
   if (ui->x_value->text() != "") {
     x = (ui->x_value->text().toDouble());
   }
-  QString toStr = QString::number(s21_parser(buf, x), 'g', 15);
+  QString toStr = QString::number(parse(buf, x), 'g', 15);
   ui->result->setText(toStr);
   is_x = 1;
 }
@@ -239,7 +240,7 @@ void MainWindow::on_pushButton_graph_clicked() {
 
   for (X = xBegin; X <= xEnd; X += h) {
     x.push_back(X);
-    y.push_back(s21_parser(buf, Y * X));
+    y.push_back(parse(buf, Y * X));
   }
   ui->widget->addGraph();
   ui->widget->graph(0)->addData(x, y);

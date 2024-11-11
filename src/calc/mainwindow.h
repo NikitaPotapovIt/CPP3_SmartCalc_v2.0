@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <QtMath>
 #include "ui_mainwindow.h"
+#include "../smartcalc_controller.h"
+#include "../smartcalc_model.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,6 +21,8 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
   Ui::MainWindow *ui;
+  SmartCalcModel model_;
+  SmartCalcController controller_; 
 
  private:
   double xBegin, xEnd, h, X, xy_1, xy_2, result_1, result_2;

@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "qcustomplot.h"
 #include <QVector>
 #include <QTimer>
 #include <QtMath>

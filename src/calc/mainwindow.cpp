@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 #include "credit.h"
 #include "deposit.h"
-#include "../smartcalc_model.h"
+// #include "../smartcalc_model.h"
+// #include "../smartcalc_controller.h"
 
 double num_first;
 int flag = 0;
@@ -16,7 +17,7 @@ int is_sign = 0;
 int is_x = 0;
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+    : QMainWindow(parent), ui(new Ui::MainWindow), controller_(&model_) {
   ui->setupUi(this);
 
   connect(ui->pushButton_0, SIGNAL(clicked()), this, SLOT(digits_numbers()));
@@ -141,12 +142,15 @@ void MainWindow::on_pushButton_equals_clicked() {
   QByteArray ba = send.toLocal8Bit();
   char *buf = ba.data();
 
-  if (ui->x_value->text() != "") {
-    x = (ui->x_value->text().toDouble());
-  }
-  QString toStr = QString::number(parse(buf, x), 'g', 15);
-  ui->result->setText(toStr);
-  is_x = 1;
+  if (!ui->x_value->text().isEmpty()) {
+        x = ui->x_value->text().toDouble();
+    }
+
+    QString expression = ui->result->text();
+    double result = controller_.calculateExpression(expression.toStdString(), x);  // Use controller
+
+    QString resultStr = QString::number(result, 'g', 15);
+    ui->result->setText(resultStr);
 }
 
 void MainWindow::on_pushButton_round_bracket_L_clicked() {
@@ -210,42 +214,42 @@ void MainWindow::on_pushButton_plus_clicked() {
 }
 
 void MainWindow::on_pushButton_graph_clicked() {
-  QString send = ui->result->text();
-  QByteArray ba = send.toLocal8Bit();
-  char *buf = ba.data();
-  ui->widget->clearGraphs();
-  x.clear();
-  y.clear();
-  result_1 = 0;
-  result_2 = 0;
-  xBegin = 0;
-  xEnd = 0;
-  h = 0.1;
+    QString expression = ui->result->text();
 
-  double Y = ui->x_value->text().toDouble();
-  double X = 0;
-  if (Y == 0) Y = 1;
+    ui->widget->clearGraphs();
+    x.clear();
+    y.clear();
+    result_1 = 0;
+    result_2 = 0;
+    h = 0.1;
 
-  xy_1 = ui->x1->text().toDouble();
-  xy_2 = ui->x2->text().toDouble();
-  result_1 = ui->y1->text().toInt();
-  result_2 = ui->y2->text().toInt();
+    double Y = ui->x_value->text().toDouble();
+    if (Y == 0) Y = 1;
 
-  xBegin = result_2;
-  xEnd = result_1 + h;
+    xy_1 = ui->x1->text().toDouble();
+    xy_2 = ui->x2->text().toDouble();
+    result_1 = ui->y1->text().toInt();
+    result_2 = ui->y2->text().toInt();
 
-  ui->widget->xAxis->setRange(xy_2, xy_1);
-  ui->widget->yAxis->setRange(result_2, result_1);
-  N = (xEnd - xBegin) / h + 2;
+    xBegin = result_2;
+    xEnd = result_1 + h;
 
-  for (X = xBegin; X <= xEnd; X += h) {
-    x.push_back(X);
-    y.push_back(parse(buf, Y * X));
-  }
-  ui->widget->addGraph();
-  ui->widget->graph(0)->addData(x, y);
-  ui->widget->replot();
+    ui->widget->xAxis->setRange(xy_2, xy_1);
+    ui->widget->yAxis->setRange(result_2, result_1);
+    N = (xEnd - xBegin) / h + 2;
+
+    for (double X = xBegin; X <= xEnd; X += h) {
+        x.push_back(X);
+        
+        double yValue = controller_.calculateExpression(expression.toStdString(), Y * X);
+        y.push_back(yValue);
+    }
+
+    ui->widget->addGraph();
+    ui->widget->graph(0)->addData(x, y);
+    ui->widget->replot();
 }
+
 
 void MainWindow::on_pushButton_x_clicked() {
   int loc_falg = 1;

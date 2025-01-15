@@ -1,8 +1,13 @@
 .PHONY: all clean dist test install uninstall rebuild gcov_report open
 
 CC = g++
-CFLAGS = -Wall -Wextra -Werror -std=c++17 `pkg-config --cflags --libs Qt6Widgets`
-LDFLAGS = `pkg-config --libs Qt6Core Qt6Gui Qt6Widgets`
+# CFLAGS = -Wall -Wextra -Werror -std=c++17 -I/Users/nikitapotapov/Qt/6.6.2/macos/lib
+# LDFLAGS = `pkg-config --libs Qt6Core Qt6Gui Qt6Widgets`
+CFLAGS = -Wall -Wextra -Werror -std=c++17 \
+         -I/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtWidgets.framework/Headers \
+         -I/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtCore.framework/Headers \
+         -I/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtGui.framework/Headers
+LDFLAGS = -L/Users/nikitapotapov/Qt/6.6.2/macos/lib -framework QtCore -framework QtWidgets -framework QtGui -framework QtPrintSupport
 SRC_FILES = smartcalc_model.cpp \
             smartcalc_controller.cpp \
             smartcalc_view.cpp \

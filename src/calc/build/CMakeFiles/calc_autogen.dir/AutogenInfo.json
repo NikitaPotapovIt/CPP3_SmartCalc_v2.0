@@ -499,10 +499,12 @@
 	"MOC_INCLUDES" : 
 	[
 		"/Users/nikitapotapov/Documents/\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b \u2014 MacBook Pro\u00a0\u2014 Nikita/School_21/project/CPP3_SmartCalc_v2.0-1/src/calc",
+		"/Users/nikitapotapov/Qt/6.6.2/macos/include/QtWidgets",
+		"/Users/nikitapotapov/Qt/6.6.2/macos/include",
+		"/Users/nikitapotapov/Qt/6.6.2/macos/lib",
 		"/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtCore.framework/Headers",
 		"/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtCore.framework",
 		"/Users/nikitapotapov/Qt/6.6.2/macos/mkspecs/macx-clang",
-		"/Users/nikitapotapov/Qt/6.6.2/macos/include",
 		"/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtWidgets.framework/Headers",
 		"/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtWidgets.framework",
 		"/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtGui.framework/Headers",

@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Подключаем модули Qt
-set(Qt6_DIR "/usr/local/Cellar/qt/6.6.0_1/lib/QtWidgets.framework/Versions/A/Headers")
+set(CMAKE_PREFIX_PATH "/Users/nikitapotapov/Qt/6.6.2/macos/lib")
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui PrintSupport)
 
 # Добавляем исходные файлы проекта
@@ -29,8 +29,10 @@ mainwindow.ui
 ../smartcalc_view.h
 credit.cpp
 credit.h
+credit.ui
 deposit.cpp
 deposit.h
+deposit.ui
 qcustomplot.cpp
 qcustomplot.h
 )
@@ -43,7 +45,13 @@ ${PROJECT_SOURCES}
 
 # Линковка с библиотеками Qt
 target_link_libraries(calc PRIVATE Qt6::Widgets Qt6::Core Qt6::Gui Qt6::PrintSupport)
-target_include_directories(calc PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(calc PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    /Users/nikitapotapov/Qt/6.6.2/macos/include
+    /Users/nikitapotapov/Qt/6.6.2/macos/include/QtWidgets
+    /Users/nikitapotapov/Qt/6.6.2/macos/lib/
+)
+
 
 # Свойства для сборки на macOS и Windows
 set_target_properties(calc PROPERTIES

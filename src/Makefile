@@ -1,8 +1,8 @@
 .PHONY: all clean dist test install uninstall rebuild gcov_report open
 
 CC = g++
-CFLAGS = -Wall -Wextra -Werror -std=c++17 `pkg-config --cflags --libs Qt5Widgets`
-LDFLAGS = `pkg-config --libs Qt5Core Qt5Gui Qt5Widgets`
+CFLAGS = -Wall -Wextra -Werror -std=c++17 `pkg-config --cflags --libs Qt6Widgets`
+LDFLAGS = `pkg-config --libs Qt6Core Qt6Gui Qt6Widgets`
 SRC_FILES = smartcalc_model.cpp \
             smartcalc_controller.cpp \
             smartcalc_view.cpp \
@@ -25,10 +25,10 @@ test: $(TARGET)
 	./$(TARGET)
 
 dist:
-	mkdir -p Archive_calc_v1.0/src
-	cp $(TARGET) Archive_calc_v1.0/src/
-	tar cvzf Archive_calc_v1.0.tgz Archive_calc_v1.0
-	rm -rf Archive_calc_v1.0
+	mkdir -p Archive_calc_v2.0/src
+	cp $(TARGET) Archive_calc_v2.0/src/
+	tar cvzf Archive_calc_v2.0.tgz Archive_calc_v2.0
+	rm -rf Archive_calc_v2.0
 
 install:
 	mkdir -p build
@@ -49,4 +49,4 @@ open: gcov_report
 rebuild: clean all
 
 clean:
-	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v1.0 build
+	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v2.0 build

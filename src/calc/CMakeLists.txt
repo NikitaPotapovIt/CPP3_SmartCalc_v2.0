@@ -11,44 +11,39 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Поиск библиотеки Qt
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Core Gui PrintSupport)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core Gui PrintSupport)
+# Подключаем модули Qt
+set(Qt6_DIR "/usr/local/Cellar/qt/6.6.0_1/lib/QtWidgets.framework/Versions/A/Headers")
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui PrintSupport)
 
 # Добавляем исходные файлы проекта
 set(PROJECT_SOURCES
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    ../smartcalc_model.cpp
-    ../smartcalc_model.h
-    ../smartcalc_controller.cpp
-    ../smartcalc_controller.h
-    ../smartcalc_view.cpp
-    ../smartcalc_view.h
-    credit.cpp
-    credit.h
-    deposit.cpp
-    deposit.h
-    qcustomplot.cpp
-    qcustomplot.h
+main.cpp
+mainwindow.cpp
+mainwindow.h
+mainwindow.ui
+../smartcalc_model.cpp
+../smartcalc_model.h
+../smartcalc_controller.cpp
+../smartcalc_controller.h
+../smartcalc_view.cpp
+../smartcalc_view.h
+credit.cpp
+credit.h
+deposit.cpp
+deposit.h
+qcustomplot.cpp
+qcustomplot.h
 )
 
-# Определение целевого приложения с учетом версии Qt
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(calc
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-    )
-else()
-    add_executable(calc
-        ${PROJECT_SOURCES}
-    )
-endif()
+# Создаем исполняемый файл
+qt_add_executable(calc
+MANUAL_FINALIZATION
+${PROJECT_SOURCES}
+)
 
 # Линковка с библиотеками Qt
-target_link_libraries(calc PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(calc PRIVATE Qt6::Widgets Qt6::Core Qt6::Gui Qt6::PrintSupport)
+target_include_directories(calc PRIVATE ${CMAKE_SOURCE_DIR})
 
 # Свойства для сборки на macOS и Windows
 set_target_properties(calc PROPERTIES
@@ -56,7 +51,7 @@ set_target_properties(calc PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-# Установка исполняемого файла в стандартные директории
+# Установка исполняемого файла
 include(GNUInstallDirs)
 install(TARGETS calc
     BUNDLE DESTINATION .
@@ -64,7 +59,5 @@ install(TARGETS calc
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Финализируем сборку для Qt6
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(calc)
-endif()
+# Финализация сборки для Qt6
+qt_finalize_executable(calc)

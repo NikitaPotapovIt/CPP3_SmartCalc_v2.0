@@ -1,57 +1,51 @@
-.PHONY: all clean dist test install uninstall rebuild gcov_report open
+.PHONY: all clean dist test install uninstall rebuild gcov_report open calc_build main_build
 
-CC = g++
-# CFLAGS = -Wall -Wextra -Werror -std=c++17 -I/Users/nikitapotapov/Qt/6.6.2/macos/lib
-# LDFLAGS = `pkg-config --libs Qt6Core Qt6Gui Qt6Widgets`
-CFLAGS = -Wall -Wextra -Werror -std=c++17 \
-         -I/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtWidgets.framework/Headers \
-         -I/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtCore.framework/Headers \
-         -I/Users/nikitapotapov/Qt/6.6.2/macos/lib/QtGui.framework/Headers
-LDFLAGS = -L/Users/nikitapotapov/Qt/6.6.2/macos/lib -framework QtCore -framework QtWidgets -framework QtGui -framework QtPrintSupport
+QT_PATH = /Users/nikitapotapov/Qt/6.8.1/macos
+QT_PATH_F = -F$(QT_PATH)
+INCLUDE_PATHS = -I$(QT_PATH)/lib/QtWidgets.framework/Headers \
+                -I$(QT_PATH)/lib/QtCore.framework/Headers \
+                -I$(QT_PATH)/lib/QtGui.framework/Headers \
+                -Icalc
+LIB_PATHS = -L$(QT_PATH)/lib
+LIBS = -framework QtCore -framework QtWidgets -framework QtGui -framework QtPrintSupport
+CC = clang++
+CFLAGS = -Wall -Wextra -Werror -std=c++17 $(INCLUDE_PATHS)
+LDFLAGS = $(LIB_PATHS) $(LIBS)
+
 SRC_FILES = smartcalc_model.cpp \
             smartcalc_controller.cpp \
             smartcalc_view.cpp \
-            ./calc/credit.cpp \
-            ./calc/deposit.cpp \
-            ./calc/main.cpp \
-            ./calc/mainwindow.cpp
+            calc/credit.cpp \
+            calc/deposit.cpp \
+            calc/main.cpp \
+            calc/mainwindow.cpp
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
-TARGET = smartcalc
+UI_FILES = calc/credit.ui calc/deposit.ui
+GENERATED_UI_HEADERS = $(UI_FILES:.ui=.h)
+TARGET = calc/smartcalc
 
-all: $(TARGET)
+# Основная цель
+all: calc_build main_build
+
+# Сборка в директории calc
+calc_build:
+	$(MAKE) -C calc
+
+# Сборка основного проекта
+main_build: $(TARGET)
 
 $(TARGET): $(OBJ_FILES)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ_FILES) $(LDFLAGS)
 
-%.o: %.cpp
+# Создание объектных файлов
+calc/%.o: calc/%.cpp $(GENERATED_UI_HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-test: $(TARGET)
-	./$(TARGET)
+# Генерация ui_*.h файлов
+calc/ui_%.h: calc/%.ui
+	$(QT_PATH)/libexec/uic $< -o $@
 
-dist:
-	mkdir -p Archive_calc_v2.0/src
-	cp $(TARGET) Archive_calc_v2.0/src/
-	tar cvzf Archive_calc_v2.0.tgz Archive_calc_v2.0
-	rm -rf Archive_calc_v2.0
-
-install:
-	mkdir -p build
-	cp $(TARGET) build/
-
-uninstall:
-	rm -rf build
-
-gcov_report: $(SRC_FILES)
-	$(CC) $(CFLAGS) --coverage $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
-	./$(TARGET)
-	lcov -t "gcov_test" -o gcov_test.info --no-external -c -d .
-	genhtml gcov_test.info -o report
-
-open: gcov_report
-	open report/index.html
-
-rebuild: clean all
-
+# Очистка
 clean:
-	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v2.0 build
+	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v2.0 build \
+	    calc/ui_*.h calc/*.o

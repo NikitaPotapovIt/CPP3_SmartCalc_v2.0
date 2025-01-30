@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project(calc VERSION 0.1 LANGUAGES CXX)
 
@@ -12,13 +12,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Указываем путь к Qt
-set(CMAKE_PREFIX_PATH "/Users/nikitapotapov/Qt/6.8.1/macos/")
-set(CMAKE_BINARY_DIR "/Users/nikitapotapov/Documents/Документы_MacBook_Pro_Nikita/School_21/project/CPP3_SmartCalc_v2.0-1/src/calc/build")
-set(CMAKE_SOURCE_DIR "/Users/nikitapotapov/Documents/Документы_MacBook_Pro_Nikita/School_21/project/CPP3_SmartCalc_v2.0-1/src/calc")
-
+set(CMAKE_PREFIX_PATH "/Users/nikitapotapov/Qt5.15.16")
 
 # Подключаем модули Qt
-find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui PrintSupport)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Core Gui PrintSupport)
 
 # Указываем пути для автогенерации (в одной директории)
 set(CMAKE_AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/autogen)
@@ -49,20 +46,17 @@ set(PROJECT_SOURCES
 )
 
 # Создаем исполняемый файл
-qt_add_executable(calc
-    MANUAL_FINALIZATION
-    ${PROJECT_SOURCES}
-)
+add_executable(calc ${PROJECT_SOURCES})
 
 # Линковка с библиотеками Qt
-target_link_libraries(calc PRIVATE Qt6::Widgets Qt6::Core Qt6::Gui Qt6::PrintSupport)
+target_link_libraries(calc PRIVATE Qt5::Widgets Qt5::Core Qt5::Gui Qt5::PrintSupport)
 
 # Указываем дополнительные пути для include
 target_include_directories(calc PRIVATE
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_AUTOGEN_BUILD_DIR} # Указываем директорию для сгенерированных файлов
-    /Users/nikitapotapov/Qt/6.8.1/macos/include
-    /Users/nikitapotapov/Qt/6.8.1/macos//lib/QtWidgets.framework/Versions/A/Headers/
+    /Users/nikitapotapov/Qt5.15.16
+    /Users/nikitapotapov/Qt5.15.16/lib/QtWidgets.framework
 )
 
 # Свойства для сборки на macOS и Windows
@@ -78,6 +72,3 @@ install(TARGETS calc
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-# Финализация сборки для Qt6
-qt_finalize_executable(calc)

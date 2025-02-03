@@ -17,7 +17,12 @@ else  # Linux
     UIC = $(QT_PATH)/bin/uic
 endif
 
-INCLUDE_PATHS = -I$(QT_PATH)/include -Icalc
+INCLUDE_PATHS = -I$(QT_PATH)/include \
+                -I$(QT_PATH)/lib/QtCore.framework/Headers \
+                -I$(QT_PATH)/lib/QtWidgets.framework/Headers \
+                -I$(QT_PATH)/lib/QtGui.framework/Headers \
+                -Iqcustomplot.h \
+                -Icalc
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror -std=c++17 $(INCLUDE_PATHS)
 LDFLAGS = $(LIB_PATHS) $(LIBS)
@@ -28,8 +33,11 @@ SRC_FILES = smartcalc_model.cpp \
             calc/credit.cpp \
             calc/deposit.cpp \
             calc/main.cpp \
-            calc/mainwindow.cpp
-OBJ_FILES = $(SRC_FILES:.cpp=.o)
+            calc/mainwindow.cpp \
+            calc/qcustomplot.cpp
+OBJ_FILES = smartcalc_model.o smartcalc_controller.o smartcalc_view.o \
+            calc/credit.o calc/deposit.o calc/main.o calc/mainwindow.o \
+            calc/qcustomplot.o calc/moc_qcustomplot.o
 
 UI_FILES = calc/credit.ui calc/deposit.ui calc/mainwindow.ui
 GENERATED_UI_HEADERS = $(UI_FILES:.ui=.h)

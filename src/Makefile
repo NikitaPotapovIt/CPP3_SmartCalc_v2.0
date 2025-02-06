@@ -24,8 +24,9 @@ INCLUDE_PATHS = -I$(QT_PATH)/include \
                 -Iqcustomplot.h \
                 -Icalc
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror -std=c++17 $(INCLUDE_PATHS)
+CFLAGS = -Wall -Wextra -Werror -std=c++17
 LDFLAGS = $(LIB_PATHS) $(LIBS)
+LFLAGS = -lgtest_main -lgtest -lpthread
 
 SRC_FILES = smartcalc_model.cpp \
             smartcalc_controller.cpp \
@@ -60,11 +61,11 @@ calc_build: calc/Makefile $(GENERATED_UI_HEADERS)
 main_build: $(TARGET)
 
 $(TARGET): $(OBJ_FILES) $(MOC_FILES)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ_FILES) $(MOC_FILES) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) -o $(TARGET) $(OBJ_FILES) $(MOC_FILES) $(LDFLAGS)
 
 # 🔹 Создание объектных файлов
 calc/%.o: calc/%.cpp $(GENERATED_UI_HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) -c $< -o $@
 
 # 🔹 Генерация `ui_*.h` файлов
 calc/ui_%.h: calc/%.ui
@@ -81,7 +82,7 @@ install: $(TARGET)
 
 # 🔹 Удаление установленного файла
 uninstall:
-	rm -f /usr/local/bin/smartcalc
+	rm -rf /usr/local/bin/smartcalc ./calc/calc.app
 
 # 🔹 Архивация проекта
 dist:
@@ -90,13 +91,27 @@ dist:
 	tar cvzf Archive_calc_v2.0.tgz Archive_calc_v2.0
 	rm -rf Archive_calc_v2.0
 
-# 🔹 Запуск тестов
-tests: $(TARGET)
-	./tests/run_tests.sh  # Предполагаем, что у тебя есть `run_tests.sh`
+# Запуск тестов
+TEST_SRC = test.cpp smartcalc_model.cpp
+TEST_OBJ = $(TEST_SRC:.cpp=.o)
+TEST_TARGET = test_runner
+
+$(TEST_OBJ): %.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TEST_TARGET): $(TEST_OBJ)
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+
+tests: uninstall $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+# Очистка тестов
+clean_tests:
+	rm -f $(TEST_OBJ) $(TEST_TARGET)
 
 # 🔹 Генерация отчета покрытия кода
 gcov_report: $(SRC_FILES)
-	$(CC) $(CFLAGS) --coverage $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) --coverage $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
 	./$(TARGET)
 	lcov -t "gcov_test" -o gcov_test.info --no-external -c -d .
 	genhtml gcov_test.info -o report
@@ -110,5 +125,5 @@ rebuild: clean all
 
 # 🔹 Очистка файлов
 clean:
-	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v2.0 build \
+	rm -rf *.o $(TARGET) *.gcno *.gcda gcov_test.info report Archive_calc_v2.0* build \
 	    calc/ui_*.h calc/moc_*.cpp calc/moc_*.h calc/*.o calc/Makefile calc/calc.app calc/.qmake.stash

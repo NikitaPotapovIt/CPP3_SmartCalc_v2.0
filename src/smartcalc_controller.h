@@ -5,6 +5,7 @@
 #include "smartcalc_model.h"
 
 // Контроллер для управления моделью
+namespace s21 {
 class SmartCalcController {
 public:
     explicit SmartCalcController(SmartCalcModel* model);
@@ -15,5 +16,7 @@ public:
 private:
     SmartCalcModel* model_;  // Указатель на модель
 };
+
+} // namespace s21
 
 #endif  // SMARTCALC_CONTROLLER_H_

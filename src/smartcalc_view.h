@@ -4,6 +4,7 @@
 #include <string>
 
 // Класс представления для работы с пользовательским интерфейсом
+namespace s21 {
 class SmartCalcView {
 public:
     // Метод для получения пользовательского ввода
@@ -12,5 +13,7 @@ public:
     // Метод для отображения результата
     void showResult(double result);
 };
+
+} // namespace s21
 
 #endif  // SMARTCALC_VIEW_H_

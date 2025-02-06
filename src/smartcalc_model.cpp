@@ -1,37 +1,73 @@
 #include "smartcalc_model.h"
+#include <cmath>
+#include <stdexcept>
+
+namespace s21 {
 
 double SmartCalcModel::parse(const std::string& expression, double x_value) {
     std::shared_ptr<Node> calc = nullptr;
     double result = 0;
     std::string tmp_str;
-    for (size_t i = 0; i <= expression.length(); i++) {
+
+    for (size_t i = 0; i < expression.length(); ++i) {
         if (isdigit(expression[i]) || expression[i] == '.') {
             tmp_str += expression[i];
         } else {
-            if (expression[i] == '+' || expression[i] == '-') {
-                if (tmp_str.empty() && expression[i - 1] != ')') tmp_str = expression[i];
-                else {
-                    lineBreak(calc, tmp_str);
-                    pushBack(calc, 0, Priority::SHORT, (expression[i] == '+') ? Type::PLUS : Type::MINUS);
-                }
-            } else if (expression[i] == '*' || expression[i] == '/') {
-                lineBreak(calc, tmp_str);
-                pushBack(calc, 0, Priority::MIDDLE, (expression[i] == '*') ? Type::MULT : Type::DIV);
-            } else if (expression[i] == '^') {
-                lineBreak(calc, tmp_str);
-                pushBack(calc, 0, Priority::HIGH, Type::POW);
-            } else if (expression[i] == 'x') {
+            if (!tmp_str.empty()) {
+                pushBack(calc, std::stod(tmp_str), Priority::SHORT, Type::NUMBER);
+                tmp_str.clear();
+            }
+
+            if (expression[i] == 'x') {
                 pushBack(calc, x_value, Priority::SHORT, Type::X);
-            } else {
-                lineBreak(calc, tmp_str);
+            } else if (expression[i] == '+') {
+                pushBack(calc, 0, Priority::SHORT, Type::PLUS);
+            } else if (expression[i] == '-') {
+                pushBack(calc, 0, Priority::SHORT, Type::MINUS);
+            } else if (expression[i] == '*') {
+                pushBack(calc, 0, Priority::MIDDLE, Type::MULT);
+            } else if (expression[i] == '/') {
+                pushBack(calc, 0, Priority::MIDDLE, Type::DIV);
+            } else if (expression[i] == '^') {
+                pushBack(calc, 0, Priority::HIGH, Type::POW);
+            } else if (expression.substr(i, 3) == "mod") {
+                pushBack(calc, 0, Priority::MIDDLE, Type::MOD);
+                i += 2;
+            } else if (expression.substr(i, 4) == "sqrt") {
+                pushBack(calc, 0, Priority::HIGH, Type::SQRT);
+                i += 3;
+            } else if (expression.substr(i, 3) == "sin") {
+                pushBack(calc, 0, Priority::HIGH, Type::SIN);
+                i += 2;
+            } else if (expression.substr(i, 3) == "cos") {
+                pushBack(calc, 0, Priority::HIGH, Type::COS);
+                i += 2;
+            } else if (expression.substr(i, 3) == "log") {
+                pushBack(calc, 0, Priority::HIGH, Type::LOG);
+                i += 2;
+            } else if (expression.substr(i, 2) == "ln") {
+                pushBack(calc, 0, Priority::HIGH, Type::LN);
+                i += 1;
+            } else if (expression[i] == '(') {
+                pushBack(calc, 0, Priority::ROUNDBRACKET, Type::ROUNDBRACKET_L);
+            } else if (expression[i] == ')') {
+                pushBack(calc, 0, Priority::ROUNDBRACKET, Type::ROUNDBRACKET_R);
             }
         }
     }
 
+    if (!tmp_str.empty()) {
+        pushBack(calc, std::stod(tmp_str), Priority::SHORT, Type::NUMBER);
+    }
+
     if (!checkBrackets(expression)) {
-        if (calc != nullptr) calc = RPN(calc);
-        if (calc != nullptr) calc = delimiter(calc);
-        if (calc != nullptr) result = this->calc(calc);
+        throw std::invalid_argument("Mismatched parentheses in expression.");
+    }
+
+    if (calc) {
+        calc = RPN(calc);
+        if (calc) calc = delimiter(calc);
+        if (calc) result = calcExpression(calc);
     }
 
     return result;
@@ -39,125 +75,127 @@ double SmartCalcModel::parse(const std::string& expression, double x_value) {
 
 std::shared_ptr<Node> SmartCalcModel::delimiter(std::shared_ptr<Node> end) {
     std::shared_ptr<Node> res = nullptr;
-    std::shared_ptr<Node> str = nullptr;
+    std::stack<std::shared_ptr<Node>> stack;
+
     while (end) {
-        if (end->priority == Priority::SHORT) {
-            pushBack(res, end->value, Priority::SHORT, Type::NUMBER);
-        } else {
-            if (str != nullptr) {
-                if (end->priority > str->priority || end->type == Type::ROUNDBRACKET_L) {
-                    pushBack(str, 0, end->priority, end->type);
-                } else {
-                    while (str && (str->type != Type::ROUNDBRACKET_L)) {
-                        pushBack(res, 0, str->priority, str->type);
-                        str = str->next;
-                    }
-                    pushBack(str, 0, end->priority, end->type);
-                }
-            } else {
-                pushBack(str, 0, end->priority, end->type);
+        if (end->type == Type::NUMBER || end->type == Type::X) {
+            pushBack(res, end->value, Priority::SHORT, end->type);
+        } else if (end->type == Type::ROUNDBRACKET_R) {
+            while (!stack.empty() && stack.top()->type != Type::ROUNDBRACKET_L) {
+                pushBack(res, 0, stack.top()->priority, stack.top()->type);
+                stack.pop();
             }
+            if (!stack.empty()) stack.pop(); // Удаляем открывающую скобку
+        } else {
+            while (!stack.empty() && stack.top()->priority >= end->priority) {
+                pushBack(res, 0, stack.top()->priority, stack.top()->type);
+                stack.pop();
+            }
+            stack.push(std::make_shared<Node>(*end));
         }
         end = end->next;
     }
 
-    while (str) {
-        if (str->type != Type::ROUNDBRACKET_L && str->type != Type::ROUNDBRACKET_R) {
-            pushBack(res, 0, str->priority, str->type);
-        }
-        str = str->next;
+    while (!stack.empty()) {
+        pushBack(res, 0, stack.top()->priority, stack.top()->type);
+        stack.pop();
     }
 
     return res;
 }
 
-double SmartCalcModel::calc(std::shared_ptr<Node> end) {
-    std::shared_ptr<Node> str = nullptr;
-    double result = 0, a = 0, b = 0;
-    int cnt = 2;
+std::shared_ptr<Node> SmartCalcModel::RPN(std::shared_ptr<Node> end) {
+    std::stack<std::shared_ptr<Node>> opStack;
+    std::shared_ptr<Node> output = nullptr;
 
     while (end) {
-        if (end->priority == Priority::SHORT) {
-            pushBack(str, end->value, Priority::SHORT, Type::NUMBER);
-        } else if (end->priority > Priority::SHORT && end->type < Type::SIN) {
-            while (cnt > 0 && str) {
-                if (cnt == 2) b = str->value;
-                else if (cnt == 1) a = str->value;
-                cnt--;
-                str = str->next;
+        if (end->type == Type::NUMBER || end->type == Type::X) {
+            pushBack(output, end->value, Priority::SHORT, end->type);
+        } else if (end->type == Type::ROUNDBRACKET_L) {
+            opStack.push(std::make_shared<Node>(*end));
+        } else if (end->type == Type::ROUNDBRACKET_R) {
+            while (!opStack.empty() && opStack.top()->type != Type::ROUNDBRACKET_L) {
+                pushBack(output, 0, opStack.top()->priority, opStack.top()->type);
+                opStack.pop();
             }
-            pushBack(str, arithmetic(a, b, end->type), Priority::SHORT, Type::NUMBER);
-            cnt = 2;
-        } else if (end->priority > Priority::SHORT) {
-            while (cnt == 2 && str) {
-                b = str->value;
-                cnt--;
-                str = str->next;
+            if (!opStack.empty()) opStack.pop(); // Удаляем открывающую скобку
+        } else {
+            while (!opStack.empty() && opStack.top()->priority >= end->priority) {
+                pushBack(output, 0, opStack.top()->priority, opStack.top()->type);
+                opStack.pop();
             }
-            pushBack(str, trigonometry(b, end->type), Priority::SHORT, Type::NUMBER);
-            cnt = 2;
+            opStack.push(std::make_shared<Node>(*end));
         }
         end = end->next;
     }
 
-    if (str) result = str->value;
-    return result;
-}
-
-double SmartCalcModel::arithmetic(double a, double b, Type sym) {
-    switch (static_cast<int>(sym)) {
-        case static_cast<int>(Type::PLUS): return a + b;
-        case static_cast<int>(Type::MINUS): return a - b;
-        case static_cast<int>(Type::DIV): return a / b;
-        case static_cast<int>(Type::MULT): return a * b;
-        case static_cast<int>(Type::POW): return std::pow(a, b);
-        case static_cast<int>(Type::MOD): return std::fmod(a, b);
-        default: return 0;
+    while (!opStack.empty()) {
+        pushBack(output, 0, opStack.top()->priority, opStack.top()->type);
+        opStack.pop();
     }
+
+    return output;
 }
 
-double SmartCalcModel::trigonometry(double a, Type sym) {
-    switch (static_cast<int>(sym)) {
-        case static_cast<int>(Type::SIN): return std::sin(a);
-        case static_cast<int>(Type::COS): return std::cos(a);
-        case static_cast<int>(Type::TAN): return std::tan(a);
-        case static_cast<int>(Type::ASIN): return std::asin(a);
-        case static_cast<int>(Type::ACOS): return std::acos(a);
-        case static_cast<int>(Type::ATAN): return std::atan(a);
-        case static_cast<int>(Type::SQRT): return std::sqrt(a);
-        case static_cast<int>(Type::LN): return std::log(a);
-        case static_cast<int>(Type::LOG): return std::log10(a);
-        default: return 0;
+double SmartCalcModel::calcExpression(std::shared_ptr<Node> end) {
+    std::stack<double> values;
+
+    while (end) {
+        if (end->type == Type::NUMBER || end->type == Type::X) {
+            values.push(end->value);
+        } else {
+            if (values.size() < 2 && end->type != Type::SQRT && end->type != Type::SIN && end->type != Type::COS && end->type != Type::LOG && end->type != Type::LN) {
+                throw std::invalid_argument("Not enough operands for operation.");
+            }
+
+            double b = values.top();
+            values.pop();
+
+            double a = (end->type == Type::SQRT || end->type == Type::SIN || end->type == Type::COS || end->type == Type::LOG || end->type == Type::LN) ? 0 : values.top();
+            if (end->type != Type::SQRT && end->type != Type::SIN && end->type != Type::COS && end->type != Type::LOG && end->type != Type::LN) {
+                values.pop();
+            }
+
+            switch (end->type) {
+                case Type::PLUS: values.push(a + b); break;
+                case Type::MINUS: values.push(a - b); break;
+                case Type::MULT: values.push(a * b); break;
+                case Type::DIV: values.push(b != 0 ? a / b : NAN); break;
+                case Type::POW: values.push(std::pow(a, b)); break;
+                case Type::MOD: values.push(b != 0 ? std::fmod(a, b) : NAN); break;
+                case Type::SIN: values.push(std::sin(b)); break;
+                case Type::COS: values.push(std::cos(b)); break;
+                case Type::SQRT: values.push(b >= 0 ? std::sqrt(b) : NAN); break;
+                case Type::LOG: values.push(b > 0 ? std::log10(b) : NAN); break;
+                case Type::LN: values.push(b > 0 ? std::log(b) : NAN); break;
+                default: throw std::invalid_argument("Unknown operator.");
+            }
+        }
+        end = end->next;
     }
-}
 
-void SmartCalcModel::pushBack(std::shared_ptr<Node>& end, double value, Priority priority, Type type) {
-    auto newNode = std::make_shared<Node>(value, priority, type);
-    newNode->next = end;
-    end = newNode;
+    return values.empty() ? NAN : values.top();
 }
 
 bool SmartCalcModel::checkBrackets(const std::string& expression) {
     int balance = 0;
+
     for (char ch : expression) {
         if (ch == '(') balance++;
         if (ch == ')') balance--;
+
+        if (balance < 0) return false;
     }
+
     return balance == 0;
 }
 
-void SmartCalcModel::lineBreak(std::shared_ptr<Node>& calc, std::string& tmp_str) {
-    if (!tmp_str.empty()) {
-        pushBack(calc, std::stod(tmp_str), Priority::SHORT, Type::NUMBER);
-        tmp_str.clear();
-    }
+void SmartCalcModel::pushBack(std::shared_ptr<Node>& end, double value, Priority priority, Type type) {
+    auto newNode = std::make_shared<Node>(value, priority, type);
+    if (!newNode) return;
+
+    newNode->next = end;
+    end = newNode;
 }
 
-std::shared_ptr<Node> SmartCalcModel::RPN(std::shared_ptr<Node> end) {
-    std::shared_ptr<Node> str = nullptr;
-    while (end != nullptr) {
-        pushBack(str, end->value, end->priority, end->type);
-        end = end->next;
-    }
-    return str;
-}
+}  // namespace s21

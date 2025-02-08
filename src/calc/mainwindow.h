@@ -20,8 +20,8 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
   Ui::MainWindow *ui;
-  SmartCalcModel model_;
-  SmartCalcController controller_; 
+  s21::SmartCalcModel model_;
+  s21::SmartCalcController controller_; 
 
  private:
   double xBegin, xEnd, h, X, xy_1, xy_2, result_1, result_2;

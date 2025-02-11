@@ -102,7 +102,6 @@ std::shared_ptr<Node> SmartCalcModel::delimiter(std::shared_ptr<Node> end) {
         } else if (end->type == Type::SIN || end->type == Type::COS || end->type == Type::TAN ||
                    end->type == Type::ASIN || end->type == Type::ACOS || end->type == Type::ATAN ||
                    end->type == Type::SQRT || end->type == Type::LOG || end->type == Type::LN) {
-            // Унарные операторы сразу помещаются в стек
             stack.push(std::make_shared<Node>(*end));
         } else {
             while (!stack.empty() && stack.top()->priority >= end->priority) {

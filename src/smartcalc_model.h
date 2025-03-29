@@ -20,7 +20,7 @@ enum class Type {
     MOD,          // Оператор mod
     SIN,          // Функция sin
     COS,          // Функция cos
-    COTAN,        // Функция cot
+    COT,          // Функция cot
     TAN,          // Функция tan
     ASIN,         // Функция asin
     ACOS,         // Функция acos

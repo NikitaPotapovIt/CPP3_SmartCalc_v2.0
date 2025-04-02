@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 #include "credit.h"
 #include "deposit.h"
-// #include "../smartcalc_model.h"
-// #include "../smartcalc_controller.h"
+#include "../smartcalc_model.h"
+#include "../smartcalc_controller.h"
 
 double num_first;
 int flag = 0;
@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->pushButton_ln, SIGNAL(clicked()), this, SLOT(digits_numbers()));
   connect(ui->pushButton_cos, SIGNAL(clicked()), this, SLOT(trigon_numbers()));
   connect(ui->pushButton_sin, SIGNAL(clicked()), this, SLOT(trigon_numbers()));
+  connect(ui->pushButton_sqrt, SIGNAL(clicked()), this, SLOT(trigon_numbers()));
   connect(ui->pushButton_tan, SIGNAL(clicked()), this, SLOT(trigon_numbers()));
   connect(ui->pushButton_log, SIGNAL(clicked()), this, SLOT(trigon_numbers()));
   connect(ui->pushButton_mul, SIGNAL(clicked()), this, SLOT(ariph_numbers()));
@@ -138,9 +139,9 @@ void MainWindow::on_pushButton_equals_clicked() {
   double x = 0;
   QPushButton *button = (QPushButton *) sender();
   button->setChecked(true);
-  QString send = ui->result->text();
-  QByteArray ba = send.toLocal8Bit();
-  char *buf = ba.data();
+  // QString send = ui->result->text();
+  // QByteArray ba = send.toLocal8Bit();
+  // char *buf = ba.data();
 
   if (!ui->x_value->text().isEmpty()) {
         x = ui->x_value->text().toDouble();

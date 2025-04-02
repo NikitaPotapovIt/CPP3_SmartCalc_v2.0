@@ -2,7 +2,7 @@ QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 QMAKE_QMAKE = /Users/nikitapotapov/Qt/5.15.16/macos/bin/qmake
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -33,7 +33,8 @@ FORMS += \
     deposit.ui \
     mainwindow.ui
 
-INCLUDEPATH += /Users/nikitapotapov/Qt5.15.16/lib/QtCore.framework/Versions/5/Headers \
+INCLUDEPATH += /Users/nikitapotapov/Qt5.15.16/include \
+               /Users/nikitapotapov/Qt5.15.16/lib/QtCore.framework/Versions/5/Headers \
                /Users/nikitapotapov/Qt5.15.16/lib/QtGui.framework/Versions/5/Headers \
                /Users/nikitapotapov/Qt5.15.16/lib/QtWidgets.framework/Versions/5/Headers
 

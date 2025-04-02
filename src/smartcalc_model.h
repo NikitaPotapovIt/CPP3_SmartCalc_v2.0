@@ -1,5 +1,5 @@
-#ifndef SMARTCALC_MODEL_H_
-#define SMARTCALC_MODEL_H_
+#ifndef SMARTCALC_MODEL_H
+#define SMARTCALC_MODEL_H
 
 #include <cmath>
 #include <memory>
@@ -50,6 +50,7 @@ struct Node {
 
     Node(double val, Priority prio, Type typ)
         : value(val), priority(prio), type(typ), next(nullptr) {}
+    ~Node() {}
 };
 
 class SmartCalcModel {
@@ -70,4 +71,4 @@ private:
 
 } // namespace s21
 
-#endif  // SMARTCALC_MODEL_H_
+#endif  // SMARTCALC_MODEL_H

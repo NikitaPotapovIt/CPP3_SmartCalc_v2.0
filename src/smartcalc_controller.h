@@ -1,5 +1,5 @@
-#ifndef SMARTCALC_CONTROLLER_H_
-#define SMARTCALC_CONTROLLER_H_
+#ifndef SMARTCALC_CONTROLLER_H
+#define SMARTCALC_CONTROLLER_H
 
 #include <string>
 #include "smartcalc_model.h"
@@ -19,4 +19,4 @@ private:
 
 } // namespace s21
 
-#endif  // SMARTCALC_CONTROLLER_H_
+#endif  // SMARTCALC_CONTROLLER_H

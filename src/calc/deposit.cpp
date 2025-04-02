@@ -39,6 +39,8 @@ void deposit::on_pushButton_credit_clicked() {
   replenishments_sum = ui->lineEdit_replenishments_sum->text().toDouble();
   replenishments_month = ui->lineEdit_partial_replanishment_month->text().toDouble();
 
+  if (periodicity_of_payments <= 0) periodicity_of_payments = 12;
+
   QString str_accrued_interest = "";
   QString str_tax_amount = "";
   QString str_deposit_end = "";

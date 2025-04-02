@@ -1,5 +1,5 @@
-#ifndef SMARTCALC_VIEW_H_
-#define SMARTCALC_VIEW_H_
+#ifndef SMARTCALC_VIEW_H
+#define SMARTCALC_VIEW_H
 
 #include <string>
 
@@ -16,4 +16,4 @@ public:
 
 } // namespace s21
 
-#endif  // SMARTCALC_VIEW_H_
+#endif  // SMARTCALC_VIEW_H
